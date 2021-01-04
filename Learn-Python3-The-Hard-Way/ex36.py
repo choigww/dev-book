@@ -12,6 +12,25 @@ def game_start():
     name, weapon, armor = create_character()
     adventure(name, weapon, armor)
 
+    exit_button = False
+
+    while not exit_button:
+        wanna_play_again = input("Wanna play again?(y/n) ")
+        if wanna_play_again == 'y':
+            keep_or_reset = input("Wanna create new character?(y/n) ")
+
+            if keep_or_reset == 'y':
+                name, weapon, armor = create_character()
+                adventure(name, weapon, armor)
+
+            else:
+                adventure(name, weapon, armor)
+
+        else:
+            print('Byebye!')
+            exit_button = True
+
+
 def create_character():
     """Define character name and choose some equipments using text input."""
     name = input("What is your name, adventurer? ")
@@ -47,42 +66,43 @@ def adventure(name, weapon, armor):
 def go_bear_cave(name, weapon, armor):
     import random
 
-    def inflict_damage(u_hp, u_attack, u_speed, u_crit, u_defense,
-                         b_hp, b_attack, b_speed, b_crit, b_defense):
-        is_user_crit = (u_crit > random.random())
-        is_bear_crit = (b_crit > random.random())
+    def is_user_faster(u_speed, b_speed):
+        return u_speed > b_speed
 
-        user_damage = u_attack + (u_attack * is_user_crit * 1.5)\
-                        - (u_attack * b_defense * random.random())
-        bear_damage = b_attack + (b_attack * is_bear_crit * 1.5)\
-                        - (b_attack * u_defense * random.random())
+    def inflict_damage(attack, crit, who):
+        is_crit = (crit > random.random())
+        damage = round(attack + (attack * is_crit * 1.5), 2)
+        if is_crit:
+            print(f"{who} made a critical hit!!! - damage: {damage}")
 
-        #u_run_prob, b_run_prob = calculate_runaway_prob(u_speed, b_speed)
+        return damage
 
-        return user_damage, bear_damage
+    def defend_damage(opponent_dmg, who):
+        guard_rate = random.random()
+        print(f"{who} guarded the attack! {round((1-guard_rate)*100, 2)}% damage reduced.")
+        return round(opponent_dmg * guard_rate, 2)
 
-    def defended_damage():
-        pass
-
-    def get_runaway_prob(u_run, u_speed, b_run, b_speed):
+    def run_away(u_speed, b_speed, who):
         if u_speed > b_speed:
-            u_runaway_prob = 0.5 + (u_speed - b_speed) * 0.1
-            b_runaway_prob = 0.5 - (u_speed - b_speed) * 0.1
+            u_runaway_prob = 0.1 + (u_speed - b_speed) * 0.05
+            b_runaway_prob = 0.1 - (u_speed - b_speed) * 0.05
 
         elif u_speed < b_speed:
-            u_runaway_prob = 0.5 - (u_speed - b_speed) * 0.1
-            b_runaway_prob = 0.5 + (u_speed - b_speed) * 0.1
+            u_runaway_prob = 0.1 - (u_speed - b_speed) * 0.05
+            b_runaway_prob = 0.1 + (u_speed - b_speed) * 0.05
 
         else:
-            u_runaway_prob, b_runaway_prob = 0.5, 0.5
+            u_runaway_prob, b_runaway_prob = 0.1, 0.1
 
         u_runaway_success = (random.random() < u_runaway_prob)
         b_runaway_success = (random.random() < b_runaway_prob)
 
-        return u_runaway_success, b_runaway_success
+        if who == 'user':
+            return u_runaway_success
+        else:
+            return b_runaway_success
 
     bear_hp, bear_attack, bear_speed, bear_crit_rate = 20, 3.5, 5, 0.15
-    user_hp, user_attack, user_speed, user_crit_rate = 0, 0, 0, 0
 
     if armor == 'heavy armor':
         user_hp, user_speed = 25, 3
@@ -94,85 +114,115 @@ def go_bear_cave(name, weapon, armor):
     else:
         user_attack, user_crit_rate = 3, 0.6
 
+    bear = {
+        'hp' : bear_hp,
+        'attack' : bear_attack,
+        'crit_rate' : bear_crit_rate,
+        'speed' : bear_speed,
+        'name' : 'bear'
+    }
+    user = {
+        'hp': user_hp,
+        'attack': user_attack,
+        'crit_rate': user_crit_rate,
+        'speed': user_speed,
+        'name' : name
+    }
+
     print("You have entered a bear cave.")
     print("*"*15+"\n"+"*"*15)
     print("-----Bear Cave-----")
     print("*"*15+"\n"+"*"*15)
 
-    give_up = False
-    while bear_hp > 0 and user_hp > 0 and not give_up:
+    while bear['hp'] > 0 and user['hp'] > 0:
+        print(f"User HP: {user['hp']} / Bear HP: {bear['hp']}")
         user_move = input('\nWhich is your next move? (attack/ defend/ run): ')
         bear_move = ['attack', 'defend', 'run'][random.randint(0, 2)]
 
-        if (user_move, bear_move) == ('attack', 'attack'):
-            if user_speed > bear_speed:
-                pass
-            else:
-                pass
+        if is_user_faster(user_speed, bear_speed):
+            first_mover, second_mover = user, bear
+            first_mover['move'] = user_move
+            second_mover['move'] = bear_move
+        else:
+            first_mover, second_mover = bear, user
+            first_mover['move'] = bear_move
+            second_mover['move'] = user_move
 
-        elif (user_move, bear_move) == ('attack', 'defend'):
-            if user_speed > bear_speed:
-                pass
-            else:
-                pass
+        if first_mover['move'] == 'attack':
 
-        elif (user_move, bear_move) == ('attack', 'run'):
-            if user_speed > bear_speed:
-                pass
+            if second_mover['move'] == 'defend':
+                second_mover['hp'] -= defend_damage(inflict_damage(first_mover['attack'],
+                                                 first_mover['crit_rate'],
+                                                first_mover['name']),
+                                                    second_mover['name'])
             else:
-                pass
+                second_mover['hp'] -= inflict_damage(first_mover['attack'],
+                                                 first_mover['crit_rate'],
+                                                first_mover['name'])
 
-        elif (user_move, bear_move) == ('defend', 'attack'):
-            if user_speed > bear_speed:
-                pass
-            else:
-                pass
+            if second_mover['hp'] <= 0:
+                continue
 
-        elif (user_move, bear_move) == ('defend', 'defend'):
-            if user_speed > bear_speed:
-                pass
-            else:
-                pass
+            if second_mover['move'] == 'attack':
+                first_mover['hp'] -= inflict_damage(second_mover['attack'],
+                                                    second_mover['crit_rate'],
+                                                    second_mover['name'])
 
-        elif (user_move, bear_move) == ('defend', 'run'):
-            if user_speed > bear_speed:
-                pass
             else:
-                pass
+                if run_away(first_mover['speed'], second_mover['speed'], second_mover['name']):
+                    print(f"{second_mover['name']} ran away!")
+                    quit(0)
 
-        elif (user_move, bear_move) == ('run', 'attack'):
-            if user_speed > bear_speed:
-                pass
-            else:
-                pass
+                else:
+                    print(f"{second_mover['name']} failed to run away!")
 
-        elif (user_move, bear_move) == ('run', 'defend'):
-            if user_speed > bear_speed:
-                pass
+
+        elif first_mover['move'] == 'defend':
+
+            if second_mover['move'] == 'attack':
+                first_mover['hp'] -= defend_damage(inflict_damage(second_mover['attack'],
+                                                                  second_mover['crit_rate'],
+                                                                  second_mover['name']),
+                                                                first_mover['name'])
+
+            elif second_mover['move'] == 'defend':
+                print('Both tried to defend, nothing happened.')
+
             else:
-                pass
+                if run_away(first_mover['speed'], second_mover['speed'], second_mover['name']):
+                    print(f"{second_mover['name']} ran away!")
+                    quit(0)
+                else:
+                    print(f"{second_mover['name']} failed to run away!")
 
         else:
-            # (user_move, bear_move) == ('run', 'run'):
-            pass
 
+            if run_away(first_mover['speed'], second_mover['speed'], first_mover['name']):
+                print(f"{first_mover['name']} ran away!")
+                quit(0)
+            else:
+                print(f"{first_mover['name']} failed to run away!")
 
-    if user_hp > bear_hp:
-        print('Yay! You did it!')
-        play_again = input("Wanna play again?(yes/ no) ")
+            if second_mover['move'] == 'attack':
+                first_mover['hp'] -= inflict_damage(second_mover['attack'],
+                                                    second_mover['crit_rate'],
+                                                    second_mover['name'])
 
-        if play_again == 'yes':
-            go_bear_cave(name, weapon, armor)
+            elif second_mover['move'] == 'defend':
+                print(f"{second_mover['name']} tried to defend, but failed.")
 
-        else:
-            print('Goodbye!')
-            quit(0)
+            else:
+                if run_away(first_mover['speed'], second_mover['speed'], second_mover['name']):
+                    print(f"{second_mover['name']} ran away!")
+                    quit(0)
+                else:
+                    print(f"{second_mover['name']} failed to run away!")
 
-    else:
+    if bear['hp'] <= 0:
+        print('Yay! You SLAYED the bear!')
+
+    if user['hp'] <= 0:
         print('Game Over')
-        quit(0)
-
-
 
 game_start()
 
