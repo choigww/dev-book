@@ -16,14 +16,13 @@ int main(void)
 	char yourName[32] = { 0 };
 	int yourAge = 0;
 
+	printf("How is your old? : ");
+	scanf("%d%*c", &yourAge);
+
 	printf("What's your name? : ");
 	gets(yourName);
 
-	printf("How is your old? : ");
-	scanf_s("%d", &yourAge);
-
-	printf("Your age is %d, and your name is ", yourAge);
-	puts(yourName);
+	printf("Your name is %s, and your name is %d.\n", yourName, yourAge);
 
 	return 0;
 }

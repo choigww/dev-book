@@ -9,7 +9,7 @@ int main(void)
 	//그리고 & 기호는 주소 연산자이며
 	//&nAge는 nAge 변수의 주소값이라는 의미
 
-	scanf_s("%d", &nAge);
+	scanf_s("%d", &nAge, sizeof(nAge));
 
 	printf("Your age is %d.\n", nAge);
 	return 0;

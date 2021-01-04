@@ -4,7 +4,7 @@ int main(void)
 {
 	int nInput = 0;
 	//scanf_s("%d\n", &nInput);
-	scanf_s("%d", &nInput);
+	scanf("%d\n", &nInput);
 
 	/*
 	getchar(), gets(), scanf() 세 함수 모두 사용자 키보드 입력 완료를 위해
