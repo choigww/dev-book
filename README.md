@@ -35,7 +35,7 @@
 4. [운영체제, Silberschatz](http://www.aladin.co.kr/shop/wproduct.aspx?ItemId=46380306)
 5. [클린 코드, 로버트 C. 마틴](http://www.aladin.co.kr/shop/wproduct.aspx?ItemId=86619346)
 6. [코딩 더 매트릭스, 필립 클라인](http://www.aladin.co.kr/shop/wproduct.aspx?ItemId=59668511)
-7 .[실용주의 프로그래머](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=38786788)
+7. [실용주의 프로그래머, 데이비드 토머스 등 2인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=38786788)
 8. [리팩토링, 마틴 파울러](http://www.aladin.co.kr/shop/wproduct.aspx?ItemId=20793053)
 9. [테스트 주도 개발, 켄트 벡](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=37469717)
 10. [피플웨어, 톰 드마르코 등 2인](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=43132954)
